@@ -1,9 +1,12 @@
-// pages/api/auth.js (LENGKAP, SIAP PAKAI)
+// pages/api/auth.js
 const FASKEY = 'efa6e135ae80bfdd3beb695780d156fc2896dab2ef2a132f11b352b02408587f';
 const GATEWAY_IP = '10.0.0.1';
 const GATEWAY_PORT = '2050';
 const crypto = require('crypto');
 
+// PERHATIAN: Jika di-deploy ke Vercel (Serverless), data di dalam Map() ini 
+// bisa ter-reset otomatis. Disarankan menggunakan Redis/Database jika production.
+// Aman jika di-hosting mandiri via Node.js (VPS).
 const authenticatedClients = new Map();
 
 function sha256(data) {
@@ -46,18 +49,33 @@ function getSplashPage(hid, fas, originurl) {
   const hid = "${hid || ''}";
   const fas = "${fas || ''}";
   const originurl = "${originurl || ''}";
+  
   document.getElementById('continueBtn').onclick = async () => {
     const btn = document.getElementById('continueBtn');
     btn.disabled = true;
     btn.textContent = 'Memproses...';
+    
     try {
       const response = await fetch(window.location.origin + '/api/auth', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'auth', hid, fas, originurl })
       });
-      if (response.redirected) window.location.href = response.url;
-      else { const data = await response.json(); if (data.redirect) window.location.href = data.redirect; }
-    } catch(e) { alert('Error: ' + e.message); }
+      
+      // PERBAIKAN CLIENT: Kita selalu baca respons sebagai JSON
+      const data = await response.json(); 
+      if (data.redirect) {
+        window.location.href = data.redirect; 
+      } else {
+        alert('Gagal mendapatkan rute akses internet.');
+        btn.disabled = false;
+        btn.textContent = 'Coba Lagi';
+      }
+    } catch(e) { 
+      alert('Error koneksi: ' + e.message); 
+      btn.disabled = false;
+      btn.textContent = 'Coba Lagi';
+    }
   };
 </script>
 </body>
@@ -96,9 +114,14 @@ export default async function handler(req, res) {
       const rhid = sha256(hid + FASKEY);
       authenticatedClients.set(rhid, { createdAt: Date.now(), hid, fas });
       console.log(`[Auth] Client authenticated: hid: ${hid.substring(0,16)}..., rhid: ${rhid.substring(0,16)}...`);
+      
       const redirectUrl = `http://${GATEWAY_IP}:${GATEWAY_PORT}/opennds_auth/?tok=${rhid}${originurl ? `&redir=${encodeURIComponent(originurl)}` : ''}`;
-      return res.redirect(302, redirectUrl);
+      
+      // PERBAIKAN SERVER: Kirim status 200 dan berikan URL di dalam object JSON. 
+      // JANGAN gunakan res.redirect() jika *client* memanggil menggunakan fetch API.
+      return res.status(200).json({ redirect: redirectUrl });
     }
+    return res.status(400).json({ error: 'Parameter hid hilang' });
   }
 
   // 5. Default (untuk akses akar atau request lain)
