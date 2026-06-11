@@ -10,6 +10,13 @@ function sha256(data) {
 }
 
 export default async function handler(req, res) {
+    if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+  
   // Handle Authmon polling (GET request dengan auth_get=view)
   if (req.method === 'GET' && req.query.auth_get === 'view') {
     const rhids = Array.from(authenticatedClients.keys());
