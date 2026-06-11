@@ -13,7 +13,7 @@ export default function Home() {
     setError('');
     
     try {
-      const response = await fetch('/api/auth', {
+      const response = await fetch('https://kota-cloud-fas.vercel.app/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -60,7 +60,7 @@ export default function Home() {
       }}>
         <h1 style={{ fontSize: '28px', marginBottom: '16px', color: '#333' }}>☕ KotaCloud DaaS</h1>
         <div style={{ background: '#4CAF50', color: 'white', padding: '8px 20px', borderRadius: '40px', display: 'inline-block', fontSize: '14px', marginBottom: '20px' }}>
-          ✅ Sistem Berjalan
+          Sistem Berjalan
         </div>
         <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '24px' }}>
           Selamat datang di layanan WiFi KotaCloud.<br />Klik tombol di bawah untuk memulai.
@@ -81,7 +81,7 @@ export default function Home() {
             opacity: loading ? 0.7 : 1
           }}
         >
-          {loading ? 'Memproses...' : '🌐 Lanjutkan ke Internet'}
+          {loading ? 'Memproses...' : 'Lanjutkan ke Internet'}
         </button>
         {error && <p style={{ marginTop: '16px', fontSize: '12px', color: '#e74c3c' }}>{error}</p>}
         <div style={{ fontSize: '11px', color: '#999', marginTop: '24px' }}>
