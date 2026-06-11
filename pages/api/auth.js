@@ -61,6 +61,8 @@ function extractOriginUrlFromFas(fasString) {
 
 // Fungsi untuk menghasilkan Halaman HTML Splash
 function getSplashPage(hid, originUrl) {
+  const apiUrl = 'https://kota-cloud-fas.vercel.app/api/auth';
+
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -98,9 +100,11 @@ function getSplashPage(hid, originUrl) {
 <body>
     <div class="card">
         <h1>☕ KotaCloud DaaS</h1>
-        <div class="badge">✅ Sistem Berjalan</div>
-        <p>Selamat datang di layanan WiFi KotaCloud.<br>Klik tombol di bawah untuk memulai.</p>
-        <button id="continueBtn">🌐 Lanjutkan ke Internet</button>
+        <div class="badge">Sistem Berjalan</div>
+        <p>Selamat datang di layanan WiFi KotaCloud.
+        <br>BAGI YANG ISENG CONNECT, INI MASIH SEMENTARA YA ANJENGG.
+        <br>Klik tombol di bawah untuk memulai.</p>
+        <button id="continueBtn">Lanjutkan ke Internet</button>
         <div id="message" class="error"></div>
         <div class="footer">Dengan melanjutkan, Anda menyetujui Syarat & Ketentuan</div>
     </div>
@@ -115,7 +119,7 @@ function getSplashPage(hid, originUrl) {
             btn.textContent = 'Memproses...';
             
             try {
-                const response = await fetch('/api/auth', {
+                const response = await fetch('https://kota-cloud-fas.vercel.app/api/auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
