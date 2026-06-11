@@ -1,5 +1,5 @@
 // Konfigurasi - HARUS SAMA DENGAN DI OPENWRT
-const FASKEY = '3f5a8c9d2e1b4f7a6c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b';
+const FASKEY = 'efa6e135ae80bfdd3beb695780d156fc2896dab2ef2a132f11b352b02408587f';
 const crypto = require('crypto');
 
 // Simpan rhid (return hashed id) - dalam produksi pakai Redis/database
