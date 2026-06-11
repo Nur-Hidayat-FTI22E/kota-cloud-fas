@@ -1,51 +1,36 @@
-cat > pages/index.js << 'EOF'
+// pages/index.js
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
-  const { fas, hid, from } = router.query;
+  const { hid, fas, originurl } = router.query;
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    // Jika tidak ada parameter FAS, ini halaman biasa
-    if (!fas && !hid && from !== 'opennds') {
-      setMessage('Mode pengujian - tidak ada parameter FAS');
-    }
-  }, [fas, hid, from]);
+  const [error, setError] = useState('');
 
   const handleContinue = async () => {
     setLoading(true);
-    setMessage('');
+    setError('');
     
     try {
-      // Kirim request autentikasi ke API
       const response = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hid: hid, fas: fas, action: 'auth' }),
+        body: JSON.stringify({ hid, fas, originurl })
       });
       
-      // Jika response redirect, ikuti redirectnya
       if (response.redirected) {
         window.location.href = response.url;
       } else {
         const data = await response.json();
         if (data.redirect) {
           window.location.href = data.redirect;
-        } else if (data.error) {
-          setMessage('Error: ' + data.error);
         } else {
-          setMessage('Autentikasi berhasil, silakan tunggu...');
-          // Tunggu 2 detik, lalu coba akses internet
-          setTimeout(() => {
-            window.location.href = 'http://neverssl.com';
-          }, 2000);
+          setError(data.error || 'Terjadi kesalahan');
         }
       }
-    } catch (error) {
-      setMessage('Error: ' + error.message);
+    } catch (err) {
+      setError('Error: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -70,11 +55,10 @@ export default function Home() {
       }}>
         <h1 style={{ fontSize: '28px', marginBottom: '16px', color: '#333' }}>☕ KotaCloud DaaS</h1>
         <div style={{ background: '#4CAF50', color: 'white', padding: '8px 20px', borderRadius: '40px', display: 'inline-block', fontSize: '14px', marginBottom: '20px' }}>
-          Sistem Berjalan
+          ✅ Sistem Berjalan
         </div>
         <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '24px' }}>
-          Selamat datang di layanan WiFi KotaCloud.<br />
-          Klik tombol di bawah untuk memulai.
+          Selamat datang di layanan WiFi KotaCloud.<br />Klik tombol di bawah untuk memulai.
         </p>
         <button
           onClick={handleContinue}
@@ -92,13 +76,9 @@ export default function Home() {
             opacity: loading ? 0.7 : 1
           }}
         >
-          {loading ? 'Memproses...' : 'Lanjutkan ke Internet'}
+          {loading ? 'Memproses...' : '🌐 Lanjutkan ke Internet'}
         </button>
-        {message && (
-          <p style={{ marginTop: '20px', fontSize: '12px', color: message.includes('berhasil') ? '#4CAF50' : '#e74c3c' }}>
-            {message}
-          </p>
-        )}
+        {error && <p style={{ marginTop: '16px', fontSize: '12px', color: '#e74c3c' }}>{error}</p>}
         <div style={{ fontSize: '11px', color: '#999', marginTop: '24px' }}>
           Dengan melanjutkan, Anda menyetujui Syarat & Ketentuan
         </div>
