@@ -1,5 +1,5 @@
 // pages/api/auth.js
-const FASKEY = '328411b33fe55127421fa394995711658526ed47d0affad3fe56a0b3930c8689';
+const FASKEY = 'efa6e135ae80bfdd3beb695780d156fc2896dab2ef2a132f11b352b02408587f';
 const GATEWAY_IP = '10.0.0.1';
 const GATEWAY_PORT = '2050';
 const crypto = require('crypto');
